@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mathforkids.domain.model.Topic
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopicChip(
     topic: Topic,

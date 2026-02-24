@@ -16,7 +16,7 @@ fun ExerciseProgressBar(
     modifier: Modifier = Modifier
 ) {
     LinearProgressIndicator(
-        progress = { progress },
+        progress = progress,
         modifier = modifier
             .fillMaxWidth()
             .height(8.dp)

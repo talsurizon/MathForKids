@@ -54,6 +54,6 @@ class Grade6Generator @Inject constructor() : ExerciseGenerator {
         val percent = listOf(10, 20, 25, 50, 75).random()
         val number = listOf(20, 40, 50, 60, 80, 100, 200, 500).random()
         val answer = number * percent / 100.0
-        "$percent% מתוך $number = ?" to answer
+        return "$percent% מתוך $number = ?" to answer
     }
 }

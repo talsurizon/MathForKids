@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mathforkids.ui.theme.CorrectGreen
-import com.mathforkids.util.Extensions
 
 @Composable
 fun MultipleChoiceAnswer(

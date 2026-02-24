@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.sp
 import com.mathforkids.domain.model.Grade
 import com.mathforkids.ui.theme.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GradeCard(
     grade: Grade,
