@@ -11,10 +11,11 @@ data class Exercise(
     val answerType: AnswerType,
     val choices: List<Double> = emptyList(),
     val grade: Grade,
-    val topic: Topic
+    val topic: Topic,
+    val correctAnswerFraction: String? = null
 ) {
     val correctAnswerDisplay: String
-        get() = if (correctAnswer == correctAnswer.toLong().toDouble()) {
+        get() = correctAnswerFraction ?: if (correctAnswer == correctAnswer.toLong().toDouble()) {
             correctAnswer.toLong().toString()
         } else {
             correctAnswer.toString()

@@ -8,8 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,7 +20,8 @@ fun FeedbackAnimation(
     isCorrect: Boolean,
     correctAnswer: String,
     visible: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFraction: Boolean = false
 ) {
     val scale by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
@@ -54,7 +53,25 @@ fun FeedbackAnimation(
                 color = if (isCorrect) CorrectGreen else WrongRed
             )
             if (!isCorrect) {
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Spacer(modifier = Modifier.height(4.dp))
+                if (isFraction && correctAnswer.contains("/")) {
+                    val parts = correctAnswer.split("/")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "${HebrewStrings.THE_ANSWER_IS}: ",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        FractionView(
+                            numerator = parts[0],
+                            denominator = parts[1],
+                            fontSize = 22.sp
+                        )
+                    }
+                } else {
                     Text(
                         text = "${HebrewStrings.THE_ANSWER_IS}: $correctAnswer",
                         style = MaterialTheme.typography.bodyLarge,

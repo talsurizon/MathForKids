@@ -20,6 +20,8 @@ data class ExerciseUiState(
     val currentIndex: Int = 0,
     val results: List<ExerciseResult> = emptyList(),
     val userInput: String = "",
+    val fractionNumerator: String = "",
+    val fractionDenominator: String = "",
     val selectedChoice: Double? = null,
     val showFeedback: Boolean = false,
     val lastAnswerCorrect: Boolean = false,
@@ -35,6 +37,14 @@ data class ExerciseUiState(
 
     val correctCount: Int
         get() = results.count { it.isCorrect }
+
+    val fractionAnswer: Double?
+        get() {
+            val num = fractionNumerator.toIntOrNull() ?: return null
+            val den = fractionDenominator.toIntOrNull() ?: return null
+            if (den == 0) return null
+            return num.toDouble() / den
+        }
 }
 
 @HiltViewModel
@@ -73,6 +83,14 @@ class ExerciseViewModel @Inject constructor(
         _uiState.update { it.copy(userInput = input) }
     }
 
+    fun onFractionNumeratorChanged(input: String) {
+        _uiState.update { it.copy(fractionNumerator = input) }
+    }
+
+    fun onFractionDenominatorChanged(input: String) {
+        _uiState.update { it.copy(fractionDenominator = input) }
+    }
+
     fun onChoiceSelected(choice: Double) {
         _uiState.update { it.copy(selectedChoice = choice) }
     }
@@ -83,7 +101,10 @@ class ExerciseViewModel @Inject constructor(
 
         val userAnswer = when (exercise.answerType) {
             AnswerType.MULTIPLE_CHOICE -> state.selectedChoice
-            AnswerType.FREE_FORM -> state.userInput.toDoubleOrNull()
+            AnswerType.FREE_FORM -> {
+                if (exercise.topic == Topic.FRACTIONS) state.fractionAnswer
+                else state.userInput.toDoubleOrNull()
+            }
         }
 
         val timeSpent = System.currentTimeMillis() - state.questionStartTime
@@ -110,6 +131,8 @@ class ExerciseViewModel @Inject constructor(
                 it.copy(
                     currentIndex = nextIndex,
                     userInput = "",
+                    fractionNumerator = "",
+                    fractionDenominator = "",
                     selectedChoice = null,
                     showFeedback = false,
                     questionStartTime = System.currentTimeMillis()

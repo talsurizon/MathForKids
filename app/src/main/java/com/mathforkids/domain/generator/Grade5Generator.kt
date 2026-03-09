@@ -14,33 +14,39 @@ class Grade5Generator @Inject constructor() : ExerciseGenerator {
         (1..count).map { generateSingle(topic) }
 
     private fun generateSingle(topic: Topic): Exercise {
-        val (question, answer) = when (topic) {
-            Topic.FRACTIONS -> generateFractionExercise()
-            Topic.DECIMALS -> generateDecimalExercise()
-            else -> generateFractionExercise()
+        return when (topic) {
+            Topic.FRACTIONS -> {
+                val (question, answer, fractionDisplay) = generateFractionExercise()
+                Exercise(question, answer, AnswerType.FREE_FORM, emptyList(), grade, topic, fractionDisplay)
+            }
+            else -> {
+                val (question, answer) = generateDecimalExercise()
+                Exercise(question, answer, AnswerType.FREE_FORM, emptyList(), grade, topic)
+            }
         }
-
-        return Exercise(question, answer, AnswerType.FREE_FORM, emptyList(), grade, topic)
     }
 
-    private fun generateFractionExercise(): Pair<String, Double> {
+    private fun generateFractionExercise(): Triple<String, Double, String> {
         val denominator = listOf(2, 3, 4, 5, 6, 8, 10).random()
         val num1 = Random.nextInt(1, denominator)
         val num2 = Random.nextInt(1, denominator)
 
         return if (Random.nextBoolean()) {
             val result = num1 + num2
-            val wholes = result / denominator
-            val remainder = result % denominator
-            val display = if (wholes > 0 && remainder > 0) "$wholes ו-$remainder/$denominator"
-            else if (wholes > 0) "$wholes"
-            else "$remainder/$denominator"
-            "$num1/$denominator + $num2/$denominator = ?" to result.toDouble() / denominator
+            Triple(
+                "$num1/$denominator + $num2/$denominator = ?",
+                result.toDouble() / denominator,
+                "$result/$denominator"
+            )
         } else {
             val bigger = maxOf(num1, num2)
             val smaller = minOf(num1, num2)
             val result = bigger - smaller
-            "$bigger/$denominator - $smaller/$denominator = ?" to result.toDouble() / denominator
+            Triple(
+                "$bigger/$denominator - $smaller/$denominator = ?",
+                result.toDouble() / denominator,
+                "$result/$denominator"
+            )
         }
     }
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mathforkids.domain.model.AnswerType
+import com.mathforkids.domain.model.Topic
 import com.mathforkids.ui.components.AnimatedButton
 import com.mathforkids.ui.screen.exercise.components.*
 import com.mathforkids.util.HebrewStrings
@@ -73,22 +74,31 @@ fun ExerciseScreen(
                     )
                 ) {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        Text(
-                            text = exercise.question,
-                            style = MaterialTheme.typography.displayMedium,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(32.dp)
-                        )
+                        if (exercise.topic == Topic.FRACTIONS) {
+                            FractionQuestionDisplay(
+                                question = exercise.question,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(32.dp)
+                            )
+                        } else {
+                            Text(
+                                text = exercise.question,
+                                style = MaterialTheme.typography.displayMedium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(32.dp)
+                            )
+                        }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
                 // Answer input
-                when (exercise.answerType) {
-                    AnswerType.MULTIPLE_CHOICE -> {
+                when {
+                    exercise.answerType == AnswerType.MULTIPLE_CHOICE -> {
                         MultipleChoiceAnswer(
                             choices = exercise.choices,
                             selectedChoice = uiState.selectedChoice,
@@ -97,7 +107,18 @@ fun ExerciseScreen(
                             onChoiceSelected = viewModel::onChoiceSelected
                         )
                     }
-                    AnswerType.FREE_FORM -> {
+                    exercise.topic == Topic.FRACTIONS -> {
+                        FractionAnswer(
+                            numerator = uiState.fractionNumerator,
+                            denominator = uiState.fractionDenominator,
+                            showFeedback = uiState.showFeedback,
+                            isCorrect = uiState.lastAnswerCorrect,
+                            onNumeratorChanged = viewModel::onFractionNumeratorChanged,
+                            onDenominatorChanged = viewModel::onFractionDenominatorChanged,
+                            onSubmit = viewModel::submitAnswer
+                        )
+                    }
+                    else -> {
                         FreeFormAnswer(
                             value = uiState.userInput,
                             showFeedback = uiState.showFeedback,
@@ -114,16 +135,19 @@ fun ExerciseScreen(
                 FeedbackAnimation(
                     isCorrect = uiState.lastAnswerCorrect,
                     correctAnswer = exercise.correctAnswerDisplay,
-                    visible = uiState.showFeedback
+                    visible = uiState.showFeedback,
+                    isFraction = exercise.topic == Topic.FRACTIONS
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
 
                 // Action button
                 if (!uiState.showFeedback) {
-                    val canSubmit = when (exercise.answerType) {
-                        AnswerType.MULTIPLE_CHOICE -> uiState.selectedChoice != null
-                        AnswerType.FREE_FORM -> uiState.userInput.isNotBlank()
+                    val canSubmit = when {
+                        exercise.answerType == AnswerType.MULTIPLE_CHOICE -> uiState.selectedChoice != null
+                        exercise.topic == Topic.FRACTIONS ->
+                            uiState.fractionNumerator.isNotBlank() && uiState.fractionDenominator.isNotBlank()
+                        else -> uiState.userInput.isNotBlank()
                     }
                     AnimatedButton(
                         text = HebrewStrings.SUBMIT,
